@@ -1,0 +1,71 @@
+{
+	"name": "CpqccMemberDirectory",
+
+	"namespace": "Cpqcc\\MemberDirectory",
+
+	"description": "This module generates a pdf directory of all the sites",
+
+	"documentation": "README.md",
+
+	"authors": [
+		{
+			"name": "Eileen Loh",
+			"email": "eloh@stanfordhealthcare.org",
+			"institution": "Software Developer"
+		},
+		{
+			"name": "Ihab Zeedia",
+			"email": "IZeedia@stanfordhealthcare.org",
+			"institution": "Software Developer"
+		}
+	],
+
+	"enable-every-page-hooks-on-system-pages": false,
+
+	"links": {
+		"project": [
+			{
+				"name": "Cpqcc Member Directory",
+				"icon": "gear",
+				"url": "index.php?NOAUTH",
+				"show-header-and-footer": false
+			}
+		],
+		"control-center": [
+
+		]
+	},
+
+	"no-auth-pages": [
+		"index"
+	],
+
+	"project-settings": [
+      {
+        "key": "enable-project-debug-logging",
+        "name": "<b>Enable Debug Logging</b> <i>(Requires emLogger)</i>",
+        "required": false,
+        "type": "checkbox"
+      }
+	],
+
+	"system-settings": [
+		{
+			"key": "enable-system-debug-logging",
+			"name": "<b>Enable Debug Logging (system-wide)</b><i>(Requires emLogger)</i>",
+			"required": false,
+			"type": "checkbox"
+		}
+	],
+
+	"crons": [
+
+	],
+
+	"compatibility": {
+		"php-version-min": "",
+		"php-version-max": "",
+		"redcap-version-min": "",
+		"redcap-version-max": ""
+	}
+}
