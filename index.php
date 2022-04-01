@@ -8,12 +8,10 @@ namespace Cpqcc\MemberDirectory;
 
 error_reporting(E_ALL);
 
-require_once('fpdf17/fpdf.php');
-
 use \FPDF;
 use REDCap;
 
-class PDF extends FPDF
+class PDF extends \FPDF
 {
     function Header() {
 
