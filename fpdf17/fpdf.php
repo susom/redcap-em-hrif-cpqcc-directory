@@ -523,6 +523,7 @@ function SetFont($family, $style='', $size=0)
 		// Test if one of the core fonts
 		if($family=='arial')
 			$family = 'helvetica';
+			if (empty($this->CoreFonts)) $this->CoreFonts = [];
 		if(in_array($family,$this->CoreFonts))
 		{
 			if($family=='symbol' || $family=='zapfdingbats')
