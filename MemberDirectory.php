@@ -1,6 +1,6 @@
 <?php
 namespace Cpqcc\MemberDirectory;
-require_once('fpdf17/fpdf.php');
+require_once('fpdf186/fpdf.php');
 require_once "emLoggerTrait.php";
 
 class MemberDirectory extends \ExternalModules\AbstractExternalModule {
