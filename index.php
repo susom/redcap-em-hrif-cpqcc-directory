@@ -18,7 +18,7 @@ class PDF extends \FPDF
     {
         $this->SetFont('Arial', 'B', 14);
         $this->SetTextColor(255, 255, 255);
-        $this->setFillColor(76, 59, 115);
+        $this->setFillColor(PURPLE_R, PURPLE_G, PURPLE_B);
         $this->SetLeftMargin(5);
         $this->Cell(0, 10, 'MEMBER DIRECTORY', 1, 1, 'C', true);
         $this->Ln(8);
@@ -27,10 +27,10 @@ class PDF extends \FPDF
 
     function Footer()
     {
-        global $module;
+        global $module, $row_start, $half_width;
         // Position at 1.0 cm from the bottom
         //$this->SetY(-13);
-        $this->Image($module->getModulePath() . '/directory_footer_2019.png', 7, 284, 196, 8);
+        $this->Image($module->getModulePath() . '/directory_footer_2019.png', $row_start, 284, 2 * $half_width, 8);
 
         //$this->setFillColor(76,59,115);
         //$this->Cell(50,10,'',0,0,'L',true);
@@ -95,6 +95,10 @@ class PDF extends \FPDF
 
 const INDENT_NL = "\n   ";
 const INDENT = "   ";
+const PURPLE_R = 76;
+const PURPLE_G = 59;
+const PURPLE_B = 115;
+
 const TEAL_R = 0;
 const TEAL_G = 137;
 const TEAL_B = 144;
@@ -226,6 +230,15 @@ function valueOrNa($value) {
     return $value;
 }
 
+function emailLineBreak($width, $email, $indented) {
+    global $pdf;
+    $indent = ($indented) ? INDENT: "";
+    if ($pdf->NbLines($width, $indent . $email) > 1) {
+        return str_replace("@","@" . INDENT_NL, $email);
+    }
+    return $email;
+}
+
 function addContactCell($x, $y, $row_height, $label, $text) {
     global $pdf, $cell_width, $line_height, $label_height, $contact_font_size;
     $pdf->SetXY($x, $y);
@@ -285,7 +298,7 @@ foreach ($data as $row) {
         $row_start = 8;
 
         // Facility name
-        $pdf->SetTextColor(76, 59, 115);
+        $pdf->SetTextColor(PURPLE_R, PURPLE_G, PURPLE_B);
         $pdf->SetFont('Arial', 'B', 14);
         $pdf->Cell(0, 5, $row['facility_name'], 0, 1, 'C');
         $pdf->Ln();
@@ -327,7 +340,6 @@ foreach ($data as $row) {
 
         $pdf->SetXY($row_start, $y);
         // draw the rectangle separately from multicells to ensure the rectangles match
-
         $pdf->Rect($row_start, $y, $half_width, $row_height);
         $pdf->MultiCell($half_width, $line_height,
             $text1, 0, 'L', false);
@@ -355,13 +367,11 @@ foreach ($data as $row) {
         $pdf->Ln(5);
 
         // Contact info
-
-
         $y = $pdf->GetY();
         $pdf->SetX($row_start);
         // Contact Header
         $pdf->setFont('Arial', 'B', 9);
-        $pdf->setFillColor(0, 137, 144);
+        $pdf->setFillColor(TEAL_R, TEAL_G, TEAL_B);
         $pdf->setTextColor(255, 255, 255);
         $pdf->Cell($header_width, $header_height, 'NICU CONTACTS', 1, 0, 'C', true);
         $pdf->SetXY($row_start + $header_width + $center_width, $y);
@@ -373,70 +383,69 @@ foreach ($data as $row) {
         $nicu1 = INDENT . $row['cpqcc_report_name'] .
             INDENT_NL . $row['cpqcc_report_title'] .
             INDENT_NL . $row['cpqcc_report_phone'] .
-            INDENT_NL . $row['cpqcc_report_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['cpqcc_report_email'], true);
         $nicu2 = INDENT . $row['cpqcc_neo_name'] .
             INDENT_NL . $row['cpqcc_neo_title'] .
             INDENT_NL . $row['cpqcc_neo_phone'] .
-            INDENT_NL . $row['cpqcc_neo_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['cpqcc_neo_email'], true);
         $hrif1 = INDENT . $row['hrif_coord_name'] .
             INDENT_NL . $row['hrif_coord_title'] .
             INDENT_NL . $row['hrif_coord_phone'] .
-            INDENT_NL . $row['hrif_coord_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['hrif_coord_email'], true);
         $hrif2 = INDENT . $row['hrif_md_name'] .
             INDENT_NL . $row['hrif_md_title'] .
             INDENT_NL . $row['hrif_md_phone'] .
-            INDENT_NL . $row['hrif_md_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['hrif_md_email'], true);
         $row_height = addContactRow($y,
             "Report Contact", $nicu1,
             "Neonatologist", $nicu2,
             "Coordinator", $hrif1,
             "Medical Director", $hrif2);
 
-        /***** END ROW 1 *****/
+        /********** END ROW ******************************/
 
         $y = $y + $row_height;
-
         $nicu1 = INDENT . $row['cpqcc_data1_name'] .
             INDENT_NL . $row['cpqcc_data1_title'] .
             INDENT_NL . $row['cpqcc_data1_phone'] .
-            INDENT_NL . $row['cpqcc_data1_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['cpqcc_data1_email'], true);
         $nicu2 = INDENT . $row['cpqcc_data2_name'] .
             INDENT_NL . $row['cpqcc_data2_title'] .
             INDENT_NL . $row['cpqcc_data2_phone'] .
-            INDENT_NL . $row['cpqcc_data2_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['cpqcc_data2_email'], true);
         $hrif1 = INDENT . $row['hrif_contact1_name'] .
             INDENT_NL . $row['hrif_contact1_title'] .
             INDENT_NL . $row['hrif_contact1_phone'] .
-            INDENT_NL . $row['hrif_contact1_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['hrif_contact1_email'], true);
         $hrif2 = INDENT . $row['hrif_contact2_name'] .
             INDENT_NL . $row['hrif_contact2_title'] .
             INDENT_NL . $row['hrif_contact2_phone'] .
-            INDENT_NL . $row['hrif_contact2_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['hrif_contact2_email'], true);
         $row_height = addContactRow($y,
             "Data 1", $nicu1,
             "Data 2", $nicu2,
             "Clinic Data 1", $hrif1,
             "Clinic Data 2", $hrif2);
 
-        /***** END ROW 2 *****/
-        $y = $y + $row_height;
+        /********** END ROW ******************************/
 
+        $y = $y + $row_height;
         $nicu1 = INDENT . $row['cpqcc_transp1_name'] .
             INDENT_NL . $row['cpqcc_transp1_title'] .
             INDENT_NL . $row['cpqcc_transp1_phone'] .
-            INDENT_NL . $row['cpqcc_transp1_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['cpqcc_transp1_email'], true);
         $nicu2 = INDENT . $row['cpqcc_transp2_name'] .
             INDENT_NL . $row['cpqcc_transp2_title'] .
             INDENT_NL . $row['cpqcc_transp2_phone'] .
-            INDENT_NL . $row['cpqcc_transp2_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['cpqcc_transp2_email'], true);
         $hrif1 = INDENT . $row['hrif_contact3_name'] .
             INDENT_NL . $row['hrif_contact3_title'] .
             INDENT_NL . $row['hrif_contact3_phone'] .
-            INDENT_NL . $row['hrif_contact3_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['hrif_contact3_email'], true);
         $hrif2 = INDENT . $row['hrif_contact4_name'] .
             INDENT_NL . $row['hrif_contact4_title'] .
             INDENT_NL . $row['hrif_contact4_phone'] .
-            INDENT_NL . $row['hrif_contact4_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['hrif_contact4_email'], true);
 
         $row_height = addContactRow($y,
             "Transport 1", $nicu1,
@@ -445,24 +454,24 @@ foreach ($data as $row) {
             "Clinic Data 4", $hrif2);
 
         /********** END ROW ******************************/
-        $y = $y + $row_height;
 
+        $y = $y + $row_height;
         $nicu1 = INDENT . $row['cpqcc_qi1_name'] .
             INDENT_NL . $row['cpqcc_qi1_title'] .
             INDENT_NL . $row['cpqcc_qi1_phone'] .
-            INDENT_NL . $row['cpqcc_qi1_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['cpqcc_qi1_email'], true);
         $nicu2 = INDENT . $row['cpqcc_qi2_name'] .
             INDENT_NL . $row['cpqcc_qi2_title'] .
             INDENT_NL . $row['cpqcc_qi2_phone'] .
-            INDENT_NL . $row['cpqcc_qi2_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['cpqcc_qi2_email'], true);
         $hrif1 = INDENT . $row['hrif_nicu_dc_name'] .
             INDENT_NL . $row['hrif_nicu_dc_title'] .
             INDENT_NL . $row['hrif_nicu_dc_phone'] .
-            INDENT_NL . $row['hrif_nicu_dc_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['hrif_nicu_dc_email'], true);
         $hrif2 = INDENT . $row['hrif_nicu1_name'] .
             INDENT_NL . $row['hrif_nicu1_title'] .
             INDENT_NL . $row['hrif_nicu1_phone'] .
-            INDENT_NL . $row['hrif_nicu1_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['hrif_nicu1_email'], true);
 
         $row_height = addContactRow($y,
             "Quality Improvement 1", $nicu1,
@@ -470,28 +479,28 @@ foreach ($data as $row) {
             "NICU Discharge", $hrif1,
             "NICU 1", $hrif2);
 
-        /***** ROW END ***********/
+        /********** END ROW ******************************/
 
         $y += $row_height;
         // CPQCC Admin
         $nicu1 = INDENT . $row['cpqcc_admin_name'] .
             INDENT_NL . $row['cpqcc_admin_title'] .
             INDENT_NL . $row['cpqcc_admin_phone'] .
-            INDENT_NL . $row['cpqcc_admin_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['cpqcc_admin_email'], true);
         // CPQCC Contract Signer
         $nicu2 = INDENT . $row['cpqcc_contract_signed'] .
             INDENT_NL . $row['cpqcc_contract_title'] .
             INDENT_NL . $row['cpqcc_contract_phone'] .
-            INDENT_NL . $row['cpqcc_contract_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['cpqcc_contract_email'], true);
         // HRIF NICU Contact #2
         $hrif1 = INDENT . $row['hrif_nicu2_dc_name'] .
             INDENT_NL . $row['hrif_nicu2_dc_title'] .
             INDENT_NL . $row['hrif_nicu2_dc_phone'] .
-            INDENT_NL . $row['hrif_nicu2_dc_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['hrif_nicu2_dc_email'], true);
         $hrif2 = INDENT . $row['hrif_nicu3_name'] .
             INDENT_NL . $row['hrif_nicu3_title'] .
             INDENT_NL . $row['hrif_nicu3_phone'] .
-            INDENT_NL . $row['hrif_nicu3_email'];
+            INDENT_NL . emailLineBreak($cell_width, $row['hrif_nicu3_email'], true);
 
         $row_height = addContactRow($y,
             "Admin", $nicu1,
@@ -499,6 +508,7 @@ foreach ($data as $row) {
             "NICU 2", $hrif1,
             "NICU 3", $hrif2);
 
+        /********** END ROW ******************************/
 
         // Last Modified Date
         $y += $row_height;
